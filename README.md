@@ -1,10 +1,10 @@
-# Seguimiento de pedidos con IA — Telegram + Make + Claude
+# Seguimiento de pedidos con IA — Prototipo en Telegram (diseñado para WhatsApp)
 
-Automatización para e-commerce que recibe consultas de seguimiento de pedidos por Telegram y clasifica automáticamente la gravedad del caso con IA, notificando a un humano (por ahora vía Telegram) cuando el caso requiere criterio humano en vez de una respuesta automática.
+Automatización para e-commerce que recibe consultas de seguimiento de pedidos y clasifica automáticamente la gravedad del caso con IA, notificando cuando el caso requiere criterio humano en vez de una respuesta automática.
 
 Este es el proyecto #2 de mi portafolio de automatización para e-commerce, después de un sistema de clasificación de preguntas de compradores con Human-in-the-loop (Make + Airtable + Claude + Slack + Gmail).
 
-> **Estado del proyecto:** la recepción, búsqueda del pedido y clasificación con IA están construidas y validadas end-to-end. El cierre del ciclo hacia el cliente (respuesta automática por telegram y aprobación humana con reenvío) está diseñado y probado en una iteración anterior, pendiente de reconectar en esta versión — ver la sección "Estructura del escenario en Make" para el detalle exacto.
+> **Estado del proyecto:** el canal de cliente originalmente planeado era WhatsApp (vía Twilio). Durante la construcción, ese canal se desconectó por completo para simplificar el debugging de un problema técnico (ver sección de resiliencia), y **toda la versión actual corre únicamente dentro de Telegram** — un mismo bot recibe los mensajes simulando al cliente, y también entrega las respuestas (tanto la automática como el aviso de escalamiento). La recepción, búsqueda del pedido y clasificación con IA están construidas y validadas end-to-end **dentro de este entorno de Telegram**. Reconectar el canal real de WhatsApp (vía Twilio) queda como el siguiente paso pendiente.
 
 ---
 
@@ -24,7 +24,7 @@ En cualquier tienda online, "¿dónde está mi pedido?" representa entre el 30% 
 ## 🗺️ Diagrama de flujo
 
 ```
-Cliente escribe por Telegram
+Cliente escribe (simulado en Telegram; el canal real previsto es WhatsApp)
         │
         ▼
 ┌───────────────────┐
@@ -73,9 +73,9 @@ respuesta sugerida       completo del caso
 (⚠️ escalamiento)
 ```
 
-⚠️ **Estado actual de construcción:** en esta versión solo existe **un escenario** (el de recepción y clasificación). **Ambas ramas del Router notifican a Telegram** — una con la etiqueta "Respuesta automática" (caso normal, con la `respuesta_sugerida` ya redactada por Claude) y otra con "⚠️ Caso requiere atención" (caso grave, con todo el contexto). Por ahora, **ningún mensaje llega de vuelta al cliente por Telegram** — el cliente solo puede escribir (canal de entrada), pero no recibe respuesta automática todavía.
+⚠️ **Estado actual de construcción:** en esta versión solo existe **un escenario**, y corre completamente dentro de **Telegram** — el mismo bot recibe el mensaje que simula al cliente, y también entrega ambas posibles respuestas: una con la etiqueta "Respuesta automática" (caso normal, con la `respuesta_sugerida` ya redactada por Claude) y otra con "⚠️ Caso requiere atención" (caso grave, con todo el contexto). **WhatsApp y Twilio no están conectados en ningún punto de esta versión.**
 
-El diseño completo con Human-in-the-loop real (un segundo escenario que recibe la respuesta aprobada por el humano en Telegram y la reenvía al cliente por Telegram) se construyó y validó en una iteración anterior del proyecto, pero **no forma parte de esta reconstrucción actual** — queda como el siguiente paso pendiente para cerrar el ciclo completo.
+El diseño original (cliente real por WhatsApp vía Twilio, con un segundo escenario donde un humano aprueba la respuesta en Telegram y esta se reenvía al cliente por WhatsApp) se había construido y validado en una iteración anterior del proyecto, pero se desconectó por completo durante el proceso de debugging (ver sección de resiliencia) y **no forma parte de esta reconstrucción actual**. Reconectar Twilio/WhatsApp como canal real de entrada y salida queda como el siguiente paso pendiente.
 
 ---
 
@@ -95,12 +95,13 @@ Cada mensaje se evalúa de forma independiente (Make no necesita "recordar" la c
 
 | Función | Herramienta | Por qué |
 |---|---|---|
-| Canal del cliente |Telegram (Twilio Sandbox) | Canal real de e-commerce; el sandbox permite probar sin aprobación de Telegrama Business |
+| Canal del cliente (previsto) | WhatsApp (Twilio Sandbox) — **no conectado en la versión actual, ver nota de estado arriba** | Canal real de e-commerce; el sandbox permite probar sin aprobación de WhatsApp Business |
+| Canal del cliente (versión actual) | Telegram (mismo bot que el de escalamiento) | Simulación temporal para depurar la lógica de clasificación sin depender de la cuota diaria de Twilio |
 | Base de datos de pedidos | Google Sheets | Simple de inspeccionar y editar a mano durante pruebas; suficiente para el alcance de un prototipo |
 | Clasificación de intención | Claude Haiku 4.5 | Tarea de clasificación + redacción corta: no requiere el razonamiento de un modelo más grande, y es notablemente más barato para iterar sin restricción |
 | Canal del humano (HITL) | Telegram Bot | Gratis sin límites de prueba, configuración en minutos, y funciona como una "bandeja de soporte" simulada |
 
-**Nota de diseño honesta:** en un e-commerce real, el canal del agente humano normalmente sería una plataforma de atención dedicada (Zendesk, Freshdesk, Gorgias, o el Telgram Business Inbox del equipo), no Telegram personal. Se usó Telegram aquí específicamente por ser gratuito y rápido de configurar para un proyecto de portafolio — la lógica de negocio (recibir el aviso, decidir, responder) es la misma que se usaría con cualquier herramienta profesional.
+**Nota de diseño honesta:** en un e-commerce real, el canal del agente humano normalmente sería una plataforma de atención dedicada (Zendesk, Freshdesk, Gorgias, o el WhatsApp Business Inbox del equipo), no Telegram personal. Se usó Telegram aquí específicamente por ser gratuito y rápido de configurar para un proyecto de portafolio — la lógica de negocio (recibir el aviso, decidir, responder) es la misma que se usaría con cualquier herramienta profesional.
 
 ---
 
@@ -133,7 +134,7 @@ Esto es lo que hace que la IA sea necesaria (no un bot de reglas fijas): interpr
 Esta sección documenta problemas reales encontrados durante la construcción, no hipotéticos — es, en mi opinión, la parte más valiosa del proyecto para demostrar criterio técnico.
 
 **1. Funciones de texto que no se evaluaban dentro de campos de mapeo.**
-Al intentar limpiar el prefijo `Telegram:` de un número de teléfono con la función `replace()`, escrita a mano dentro de un campo de Make, la función nunca se ejecutaba — se guardaba como texto literal en vez de evaluarse, sin importar el separador de argumentos usado ni el módulo de destino (se probó en un filtro de Data Store, un filtro de Google Sheets, un campo de Telegram, y un módulo dedicado "Set variable"). En vez de seguir depurando ese comportamiento puntual, se rediseñó el flujo para no depender de esa transformación de texto en absoluto: comparar el número de pedido (texto simple, sin prefijos) en vez del teléfono. Lección: cuando una pieza técnica específica se resiste después de varios intentos razonables de diagnóstico, a veces la solución más eficiente es rediseñar para evitar esa dependencia, no insistir en resolverla a toda costa.
+Al intentar limpiar el prefijo `whatsapp:` de un número de teléfono con la función `replace()`, escrita a mano dentro de un campo de Make, la función nunca se ejecutaba — se guardaba como texto literal en vez de evaluarse, sin importar el separador de argumentos usado ni el módulo de destino (se probó en un filtro de Data Store, un filtro de Google Sheets, un campo de Telegram, y un módulo dedicado "Set variable"). En vez de seguir depurando ese comportamiento puntual, se rediseñó el flujo para no depender de esa transformación de texto en absoluto: comparar el número de pedido (texto simple, sin prefijos) en vez del teléfono. Lección: cuando una pieza técnica específica se resiste después de varios intentos razonables de diagnóstico, a veces la solución más eficiente es rediseñar para evitar esa dependencia, no insistir en resolverla a toda costa.
 
 **2. JSON de Claude envuelto en marcadores de código.**
 El modelo ocasionalmente devolvía el JSON envuelto en ` ```json ... ``` ` a pesar de instrucciones explícitas en el prompt pidiendo JSON puro. Solución: un módulo de Text Parser (`(\{[\s\S]*\})`, con paréntesis de captura) entre Claude y el parser de JSON, que extrae solo el bloque `{...}` sin importar qué texto lo rodee — resiliente independientemente de si el modelo decide envolver la respuesta o no.
@@ -156,10 +157,15 @@ Para esta tarea (clasificar un mensaje corto + redactar una respuesta breve), se
 
 ## 🏗️ Estructura del escenario en Make
 
-**Escenario único, construido hasta ahora — Recepción y clasificación:**
-Webhook (Twilio, recibe el mensaje del cliente por Telegram) → Text Parser (detecta número de pedido) → Router → [sin pedido: responde pidiendo el número, por Telegram] / [con pedido: Google Sheets → Claude → Text Parser (limpieza JSON) → Parse JSON → Router → Telegram (respuesta automática, caso normal) / Telegram (aviso de escalamiento, caso grave)]
+**Escenario único, construido hasta ahora — Recepción y clasificación (todo dentro de Telegram):**
+Telegram Bot (Watch Updates, recibe el mensaje que simula al cliente) → Text Parser (detecta número de pedido) → Router → [sin pedido: responde pidiendo el número] / [con pedido: Google Sheets → Claude → Text Parser (limpieza JSON) → Parse JSON → Router → Telegram (respuesta automática, caso normal) / Telegram (aviso de escalamiento, caso grave)]
 
-⚠️ **Pendiente — cerrar el ciclo hacia el cliente:** reconectar la rama de "caso normal" a Twilio para que el cliente reciba la respuesta directo por Telegram, y reconstruir el segundo escenario (Telegram → Text Parser → Twilio) que permite que un humano apruebe/redacte la respuesta de los casos escalados y esta se reenvíe al cliente. Ambas piezas ya se diseñaron y probaron en una iteración anterior del proyecto, solo falta reconectarlas en esta reconstrucción.
+⚠️ **Pendiente — reconectar el canal real:**
+1. Reemplazar el trigger de Telegram por el Webhook de Twilio, para recibir mensajes reales de WhatsApp.
+2. Reconectar la rama de "caso normal" a Twilio, para que el cliente reciba la respuesta directo por WhatsApp en vez de una notificación de Telegram.
+3. Reconstruir el segundo escenario (Telegram → Text Parser → Twilio) que permite que un humano apruebe/redacte la respuesta de los casos escalados y esta se reenvíe al cliente por WhatsApp.
+
+Las 3 piezas ya se diseñaron y probaron en una iteración anterior del proyecto, antes de desconectarlas temporalmente para simplificar el debugging.
 
 ---
 
