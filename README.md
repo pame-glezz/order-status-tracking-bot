@@ -36,7 +36,7 @@ Una gran parte de los tickets de soporte de cualquier tienda online son simpleme
 
 ## 🗺️ Diagrama de flujo
 
-![Diagrama del escenario completo en Make](imagenes/diagrama_escenario_make.png)
+![Diagrama del escenario completo en Make](diagrama_escenario_make.png)
 
 ```
 Cliente escribe
@@ -116,7 +116,9 @@ Cada mensaje se evalúa de forma independiente (Make no necesita "recordar" la c
 
 Hoja de cálculo `pedidos_ecommerce`:
 
-![Tabla de pedidos en Google Sheets](imagenes/modelo_datos_google_sheets.png)
+📄 **Ver la hoja completa:** [pedidos_ecommerce en Google Sheets](https://docs.google.com/spreadsheets/d/1gWBHrjeR3AKAGzwasX9zAQ1kyL1MiylGpXSluCsuZo8/edit?usp=sharing)
+
+![Tabla de pedidos en Google Sheets](modelo_datos_google_sheets.png)
 
 | Campo | Tipo | Ejemplo |
 |---|---|---|
@@ -138,7 +140,7 @@ Esto es lo que hace que la IA sea necesaria (no un bot de reglas fijas): interpr
 
 **Ejemplo real de una conversación completa:**
 
-![Prueba del flujo completo en Telegram](imagenes/prueba_flujo_telegram.png)
+![Prueba del flujo completo en Telegram](prueba_flujo_telegram.png)
 
 ---
 
