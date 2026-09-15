@@ -65,9 +65,10 @@ Cliente escribe por WhatsApp
   false                   true
      │                      │
      ▼                      ▼
-Responde al cliente    Avisa a un humano por
-por WhatsApp            Telegram con el contexto
-(automático)            completo del caso
+Notifica por            Avisa a un humano por
+Telegram con la          Telegram con el contexto
+respuesta sugerida       completo del caso
+(⚠️ escalamiento)
                               │
                               ▼
                     Humano responde en Telegram
@@ -77,6 +78,8 @@ por WhatsApp            Telegram con el contexto
                     Se reenvía al cliente por
                     WhatsApp (Escenario 2)
 ```
+
+⚠️ **Estado actual de construcción:** en esta versión, **ambas ramas del Router notifican a Telegram** — una con la etiqueta "Respuesta automática" (caso normal, con la `respuesta_sugerida` ya redactada por Claude) y otra con "⚠️ Caso requiere atención" (caso grave, con todo el contexto). El envío directo al cliente por WhatsApp para el caso normal (usando Twilio) fue la intención original de diseño, pero **no está reconectado en la versión que se dejó funcionando** — queda como el siguiente paso pendiente antes de considerar el Escenario 1 completo end-to-end.
 
 ---
 
@@ -158,7 +161,9 @@ Para esta tarea (clasificar un mensaje corto + redactar una respuesta breve), se
 ## 🏗️ Estructura del escenario en Make
 
 **Escenario 1 — Recepción y clasificación:**
-Webhook (Twilio) → Text Parser (detecta número de pedido) → Router → [sin pedido: responde pidiendo el número] / [con pedido: Google Sheets → Claude → Text Parser (limpieza JSON) → Parse JSON → Router → Twilio (respuesta automática) / Telegram (aviso de escalamiento)]
+Webhook (Twilio) → Text Parser (detecta número de pedido) → Router → [sin pedido: responde pidiendo el número] / [con pedido: Google Sheets → Claude → Text Parser (limpieza JSON) → Parse JSON → Router → Telegram (respuesta automática, caso normal) / Telegram (aviso de escalamiento, caso grave)]
+
+⚠️ Pendiente: reconectar la rama de "caso normal" a Twilio para que el cliente reciba la respuesta directo por WhatsApp, en vez de que ambas rutas notifiquen a Telegram como está ahora.
 
 **Escenario 2 — Aprobación humana:**
 Telegram (Watch Updates) → Text Parser (separa teléfono y mensaje) → Twilio (reenvía la respuesta aprobada al cliente)
