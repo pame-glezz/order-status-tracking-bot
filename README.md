@@ -174,6 +174,8 @@ Para esta tarea (clasificar un mensaje corto + redactar una respuesta breve), se
 
 Telegram Bot (Watch Updates) → Text Parser (detecta número de pedido) → Router → [sin pedido: responde pidiendo el número] / [con pedido: Google Sheets → Claude → Text Parser (limpieza JSON) → Parse JSON → Router → Telegram (respuesta automática, caso normal) / Telegram (aviso de escalamiento, caso grave)]
 
+📦 **Blueprint exportado:** [escenario_make.blueprint.json](escenario_make.blueprint.json) — puedes importarlo directo a tu cuenta de Make (menú de escenarios → Create a new scenario → Import Blueprint) para ver la configuración exacta de cada módulo.
+
 ---
 
 ## ✅ Habilidades demostradas
