@@ -2,49 +2,25 @@
 
 Bot automatizado para consultas de estado de pedidos usando Claude AI, Telegram, Google Sheets y Make.
 
-## 📹 Demo en Video
-
-[![Ver funcionamiento en YouTube](https://img.youtube.com/vi/[VIDEO_ID]/maxresdefault.jpg)](https://www.youtube.com/watch?v=[VIDEO_ID])
-
-**[Insertar aquí el link de YouTube del video de demostración]**
-
----
-
-## 📸 Capturas de Pantalla
-
-### Conversación en Telegram - Flujo Completo
-
-![Conversación Telegram](./images/telegram-demo.png)
-
-*[Insertar captura de pantalla de la conversación en Telegram mostrando Turno 1 y Turno 2]*
-
-### Escenario en Make - Arquitectura Visual
-
-![Arquitectura Make](./images/make-scenario.png)
-
-*[Insertar captura de pantalla del flujo completo en Make]*
-
-### Base de Datos - Google Sheets
-
-![Google Sheets](./images/google-sheets.png)
-
-*[Insertar captura de los 15-20 pedidos ficticios en Google Sheets]*
-
 ---
 
 ## 📋 Tabla de Contenidos
 
-- [Descripción](#descripción)
-- [Características](#características)
-- [Scope](#scope)
-- [Arquitectura](#arquitectura)
-- [Flujo de Funcionamiento](#flujo-de-funcionamiento)
-- [Tecnologías](#tecnologías)
-- [Desafíos y Soluciones](#desafíos-y-soluciones)
-- [Lecciones Aprendidas](#lecciones-aprendidas)
-- [Preguntas Comunes](#preguntas-comunes)
-- [Resultados](#resultados)
-- [Cómo Usar](#cómo-usar)
+- [📖 Descripción](#descripción)
+- [✨ Características](#características)
+- [⚠️ Scope](#scope)
+- [🏗️ Arquitectura](#arquitectura)
+- [🔄 Flujo de Funcionamiento](#flujo-de-funcionamiento)
+- [🛠️ Tecnologías](#tecnologías)
+- [🐛 Desafíos y Soluciones](#desafíos-y-soluciones)
+- [💡 Lecciones Aprendidas](#lecciones-aprendidas)
+- [❓ Preguntas Comunes](#preguntas-comunes)
+- [📊 Resultados](#resultados)
+- [🚀 Cómo Usar](#cómo-usar)
+- [⚙️ Configuración](#configuración)
+- [📹 Demo y Capturas](#-demo-y-capturas)
+
+---
 
 ---
 
@@ -524,5 +500,61 @@ Este proyecto es de código abierto bajo licencia MIT.
 
 ---
 
+## 📹 Demo y Capturas
+
+### Video de Demostración
+
+[![Ver funcionamiento en YouTube](https://img.youtube.com/vi/[VIDEO_ID]/maxresdefault.jpg)](https://www.youtube.com/watch?v=[VIDEO_ID])
+
+**[Insertar aquí el link de YouTube del video de demostración]**
+
+En el video verás:
+- ✅ Turno 1: Cliente sin número de pedido
+- ✅ Turno 2: Cliente con número (respuesta automática)
+- ✅ Turno 3: Cliente con retraso crítico (escalada a humano)
+
+---
+
+### Conversación en Telegram - Flujo Completo
+
+![Conversación Telegram](./images/telegram-demo.png)
+
+*[Insertar captura de pantalla de la conversación en Telegram mostrando Turno 1 y Turno 2]*
+
+Muestra:
+- Mensaje sin número → Pide número
+- Mensaje con número → Respuesta automática con estado
+- Flujo completo de interacción
+
+---
+
+### Escenario en Make - Arquitectura Visual
+
+![Arquitectura Make](./images/make-scenario.png)
+
+*[Insertar captura de pantalla del flujo completo en Make]*
+
+Muestra:
+- 13 módulos conectados
+- Flujo visual de datos
+- Routers de decisión
+- Integración de APIs
+
+---
+
+### Base de Datos - Google Sheets
+
+![Google Sheets](./images/google-sheets.png)
+
+*[Insertar captura de los 15-20 pedidos ficticios en Google Sheets]*
+
+Muestra:
+- 15-20 pedidos ficticios
+- Columnas: numero_pedido, estado, dias_retraso
+- Datos reales que consume el bot
+
+---
+
 **Última actualización:** Septiembre 2026
 **Estado:** Funcional y en producción ✅
+
