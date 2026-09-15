@@ -479,11 +479,7 @@ order-status-tracking-bot/
 
 ## 👨‍💻 Autor
 
-[Tu Nombre]
-
-**LinkedIn:** [Tu perfil]
-**GitHub:** [@tu-usuario](https://github.com/tu-usuario)
-
+Pamela Gonzalez 
 ---
 
 ## 📄 Licencia
