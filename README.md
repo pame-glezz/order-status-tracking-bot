@@ -36,6 +36,8 @@ Una gran parte de los tickets de soporte de cualquier tienda online son simpleme
 
 ## 🗺️ Diagrama de flujo
 
+![Diagrama del escenario completo en Make](imagenes/diagrama_escenario_make.png)
+
 ```
 Cliente escribe
         │
@@ -114,6 +116,8 @@ Cada mensaje se evalúa de forma independiente (Make no necesita "recordar" la c
 
 Hoja de cálculo `pedidos_ecommerce`:
 
+![Tabla de pedidos en Google Sheets](imagenes/modelo_datos_google_sheets.png)
+
 | Campo | Tipo | Ejemplo |
 |---|---|---|
 | numero_pedido | Texto | PED-001 |
@@ -131,6 +135,10 @@ Hoja de cálculo `pedidos_ecommerce`:
 Claude recibe el mensaje del cliente junto con el estado real del pedido, y responde en JSON con 4 campos: `intencion`, `urgencia`, `requiere_humano`, y `respuesta_sugerida`. La regla de escalamiento: se marca `requiere_humano: true` si el cliente expresa frustración fuerte, si el retraso supera 5 días, o si menciona daño o extravío — en cualquier otro caso, Claude redacta directamente la respuesta.
 
 Esto es lo que hace que la IA sea necesaria (no un bot de reglas fijas): interpretar lenguaje libre y variable ("llevo una semana esperando y nadie me dice nada" vs. "¿ya casi llega?") es justo el tipo de ambigüedad que un árbol de decisiones no maneja bien.
+
+**Ejemplo real de una conversación completa:**
+
+![Prueba del flujo completo en Telegram](imagenes/prueba_flujo_telegram.png)
 
 ---
 
